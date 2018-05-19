@@ -1,4 +1,4 @@
-import requests, string, csv, sys, time, os
+import requests, string, csv, sys, time, os, re
 from lxml import html
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -24,15 +24,28 @@ def extract_info():
 
 def lists(l1, l2, l3, l4, l5):
     j = 0
-    teste = 'D'
-    #se for diferente de Dia nao adiciona
+    #If l5 not D than dont add
     for i in range(0, len(l5)):
-        if l5[i] == teste:
+        city_state = []
+        if l5[i] == 'D':
+            #remove '(' and ')' and separate City and state into two different strings
+            city_state = l2[i].split("(")
+            city_state[1] = city_state[1].replace(")","")
+            #insert only the informations with D(the Daily information)
             product.append(l1[i])
-            ce.append(l2[i])
+            city.append(city_state[0])
+            state.append(city_state[1])
             price.append(l3[i])
             data.append(l4[i])
             freq.append(l5[i])
+
+def csv_creator(product, city, state, price, data, freq):
+    row = zip(product, city, state, price, data, freq)
+    #SALVA OS VALORES RECEBIDO EM UMA LISTA
+    with open("csvfile", "w") as output:
+        writer = csv.writer(output, lineterminator='\n')
+        for val in row:
+            writer.writerow(val)
 
 #evita que o chrome abra.
 chrome_options = Options()
@@ -46,7 +59,8 @@ driver.get("https://www.agrolink.com.br/cotacoes/"+sit+"")
 page = requests.get(driver.current_url)
 tree = html.fromstring(page.content)
 product = []
-ce = []
+city = []
+state = []
 price = []
 data = []
 freq = []
@@ -55,13 +69,15 @@ extract_info()
 walk = 0
 aux = 2
 while (walk == 0):
+    print aux
     p = str(aux)
     #Executa o javascript da paginacao e vai para a proxima pagina.
     driver.execute_script("javascript:navigateToPage('frmFiltroGeral-5231', " + p + ")")
     #verifica se ja passou da ultima pagina.
     last_page = tree.xpath('//*[@id="frmMercadoFisico-5181"]/div/span/text()')
     #para o loop
-    if len(last_page) != 0:
+    #if len(last_page) != 0:
+    if aux == 3:
         walk = 1
     else:
         time.sleep(5)
@@ -70,12 +86,5 @@ while (walk == 0):
         tree = html.fromstring(page)
         extract_info()
         aux = aux + 1
-
-row = zip(product, ce, price, data, freq)
-#SALVA OS VALORES RECEBIDO EM UMA LISTA
-with open("csvfile", "w") as output:
-    writer = csv.writer(output, lineterminator='\n')
-    for val in row:
-        writer.writerow(val)
-#driver.get_screenshot_as_file("capture.png")
+csv_creator(product, city, state, price, data, freq)
 driver.close()
