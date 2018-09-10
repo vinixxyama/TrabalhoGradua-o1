@@ -40,12 +40,13 @@ def lists(l1, l2, l3, l4, l5):
             freq.append(l5[i])
 
 def csv_creator(product, city, state, price, data, freq):
-    row = zip(product, city, state, price, data, freq)
-    #SALVA OS VALORES RECEBIDO EM UMA LISTA
-    with open("csvfile", "w") as output:
+    row = zip(product, city, data, state, price)
+    #save the values into a list
+    with open("tudocsvfile", "w") as output:
         writer = csv.writer(output, lineterminator='\n')
         for val in row:
             writer.writerow(val)
+    
 
 #evita que o chrome abra.
 chrome_options = Options()
@@ -53,38 +54,47 @@ chrome_options.add_argument("--headless")
 chrome_options.add_argument("--window-size=1920x1080")
 #Usa selenium que usa o chrome para navegar no site.
 driver = webdriver.Chrome(chrome_options=chrome_options)
-sit = '/graos/milho'
-driver.get("https://www.agrolink.com.br/cotacoes/"+sit+"")
-#driver.find_element_by_xpath('//tr//td//a[@href="/cotacoes/graos/'+ sit +'"]').click()
-page = requests.get(driver.current_url)
-tree = html.fromstring(page.content)
-product = []
-city = []
-state = []
-price = []
-data = []
+sit = ['/graos/milho','/graos/soja','/graos/cafe','/graos/feijao','/graos/trigo','/graos/arroz', 
+'/carnes/aves', '/carnes/bovinos', '/carnes/bubalinos', '/carnes/caprinos', '/carnes/ovinos', '/carnes/suinos',
+'/hortalicas/beterraba', '/hortalicas/cenoura', '/hortalicas/tomate',
+'/frutas/banana', '/frutas/laranja', '/frutas/maca', '/frutas/uva', '/frutas/caqui', '/frutas/cacau', '/frutas/goiaba',
+'/frutas/lima', '/frutas/mamao', '/frutas/manga', '/frutas/maracuja', '/frutas/melancia', '/frutas/melao', '/frutas/morango',
+'/frutas/tangerina', '/diversos/acucar', '/diversos/algodao', '/diversos/alho', '/diversos/amendoin', '/diversos/azevem',
+'/diversos/batata', '/diversos/cana-de-acucar', '/diversos/cebola', '/diversos/dende', '/diversos/erva-mate',
+'/diversos/farelo-de-soja', '/diversos/farinha-de-mandioca', '/diversos/girassol', '/diversos/leite', '/diversos/mandioca','/diversos/ovos'
+]
+product = ['nomeproduto']
+city = ['nomecidade']
+state = ['UF']
+price = ['preco']
+data = ['datacorrente']
 freq = []
-
-extract_info()
-walk = 0
-aux = 2
-while (walk == 0):
-    print aux
-    p = str(aux)
-    #Executa o javascript da paginacao e vai para a proxima pagina.
-    driver.execute_script("javascript:navigateToPage('frmFiltroGeral-5231', " + p + ")")
-    #verifica se ja passou da ultima pagina.
-    last_page = tree.xpath('//*[@id="frmMercadoFisico-5181"]/div/span/text()')
-    #para o loop
-    #if len(last_page) != 0:
-    if aux == 3:
-        walk = 1
-    else:
-        time.sleep(5)
-        #ATUALIZA O HTML
-        page = driver.execute_script("return document.body.innerHTML")
-        tree = html.fromstring(page)
-        extract_info()
-        aux = aux + 1
+for ct in range(0,len(sit)):
+    driver.get("https://www.agrolink.com.br/cotacoes"+sit[ct]+"")
+    print "https://www.agrolink.com.br/cotacoes"+sit[ct]+""
+    page = requests.get(driver.current_url)
+    tree = html.fromstring(page.content)
+    extract_info()
+    walk = 0
+    aux = 2
+    while (walk == 0):
+        print aux
+        p = str(aux)
+        #Executa o javascript da paginacao e vai para a proxima pagina.
+        driver.execute_script("javascript:navigateToPage('frmFiltroGeral-5231', " + p + ")")
+        #verifica se ja passou da ultima pagina.
+        last_page = tree.xpath('//*[@id="frmMercadoFisico-5181"]/div/span/text()')
+        #para o loop
+        if len(last_page) != 0:
+        #if aux == 10:
+            walk = 1
+        else:
+            time.sleep(5)
+            #ATUALIZA O HTML
+            page = driver.execute_script("return document.body.innerHTML")
+            tree = html.fromstring(page)
+            extract_info()
+            aux = aux + 1
+            
 csv_creator(product, city, state, price, data, freq)
 driver.close()
