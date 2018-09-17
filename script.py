@@ -51,6 +51,8 @@ def csv_creator(product, city, state, price, data, freq):
 #evita que o chrome abra.
 chrome_options = Options()
 chrome_options.add_argument("--headless")
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-dev-shm-usage')
 chrome_options.add_argument("--window-size=1920x1080")
 #Usa selenium que usa o chrome para navegar no site.
 driver = webdriver.Chrome(chrome_options=chrome_options)
