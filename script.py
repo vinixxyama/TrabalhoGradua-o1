@@ -50,14 +50,14 @@ def csv_creator(product, city, state, price, data, freq):
 
 #evita que o chrome abra.
 chrome_options = Options()
-chrome_options.binary_location = GOOGLE_CHROME_BIN
+chrome_options.binary_location = '/app/.apt/usr/bin/google-chrome'
 chrome_options.add_argument("--headless")
 chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
 chrome_options.add_argument("--window-size=1920x1080")
 #Usa selenium que usa o chrome para navegar no site.
-driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
+driver = webdriver.Chrome(executable_path='/app/.chromedriver/bin/chromedriver', chrome_options=chrome_options)
 sit = ['/graos/milho','/graos/soja','/graos/cafe','/graos/feijao','/graos/trigo','/graos/arroz', 
 '/carnes/aves', '/carnes/bovinos', '/carnes/bubalinos', '/carnes/caprinos', '/carnes/ovinos', '/carnes/suinos',
 '/hortalicas/beterraba', '/hortalicas/cenoura', '/hortalicas/tomate',
