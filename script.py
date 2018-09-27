@@ -50,7 +50,7 @@ def csv_creator(product, city, state, price, data, freq):
 
 #evita que o chrome abra.
 chrome_options = Options()
-chrome_options.binary_location = '/app/.apt/usr/bin/google-chrome'
+chrome_options.binary_location = /app/.apt/usr/bin/google-chrome
 chrome_options.add_argument("--headless")
 chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument('--no-sandbox')
